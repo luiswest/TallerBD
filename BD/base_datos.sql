@@ -44,4 +44,14 @@ CREATE TABLE cliente (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
+DROP TABLE IF EXISTS usuario;
+CREATE TABLE usuario (
+  id int(11) NOT NULL AUTO_INCREMENT,  
+  idUsuario Varchar(15) NOT NULL,
+  rol int not NULL,
+  passw varchar(255) not NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY idx_correo (idUsuario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
 COMMIT;

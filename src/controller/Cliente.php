@@ -4,7 +4,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Container\ContainerInterface;
 use PDO;
-class Cliente {
+class Cliente EXTENDS Usuario{
     protected $container;
     public function __construct(ContainerInterface $c) {
         $this->container = $c;
@@ -34,7 +34,27 @@ class Cliente {
             ->withHeader('Content-Type', 'Application/json')
             ->withStatus($status);
     }
-    public function buscar (Request $request, Response $response, $args) {
+    public function numRegs (Request $request, Response $response, $args) {
+        //Retornar todos los registros con limit
+        $datos = $request->getQueryParams();
+        $cadena = "";
+        foreach($datos as $valor){
+            $cadena .= "%$valor%&";
+        }
+        $sql = "call numRegsCliente('$cadena');";
+        $con = $this->container->get('bd');
+        $query = $con->prepare($sql);
+        $query->execute();
+        $res['cant'] = $query->fetch(PDO::FETCH_NUM)[0];
+        $query = null;
+        $con = null;
+
+        $response->getBody()->write(json_encode($res));
+        return $response
+            ->withHeader('Content-Type', 'Application/json')
+            ->withStatus(200);
+    }
+    public function buscarCliente (Request $request, Response $response, $args) {
         //Retornar un registro por código
        // $id = $args['id'];
         $sql = "call buscarCliente(:id);";
@@ -59,22 +79,19 @@ class Cliente {
     public function crear (Request $request, Response $response, $args) {
         //Crear nuevo
         $body = json_decode($request->getBody());
+
         $sql = "select nuevoCliente(";
         foreach($body as $campo => $valor) {
             $sql .= ":$campo,";
             $d[$campo] = filter_var($valor, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         }
         $sql = rtrim($sql, ',') . ");";
-        $con = $this->container->get('bd');
-        $query = $con->prepare($sql);
-        $query->execute($d);
-        $res = $query->fetch(PDO::FETCH_NUM);
-        $query = null;
-        $con = null;
+        $d['idUsuario'] = $d['idCliente'];
+        // esta linéa puede ser del cliente o generado automáticamente
+        $d['passw'] = password_hash($d['idCliente'],PASSWORD_BCRYPT, ['cost' => 10]);
+        $res = $this->guardarUsuario($sql, $d,  4);
+        $status = $res > 0 ? 409 : 201;
 
-        $status = $res[0] > 0 ? 409 : 201;
-
-       // $response->getBody()->write(json_encode($resultado));
         return $response
             ->withStatus($status);
     }

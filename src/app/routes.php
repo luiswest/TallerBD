@@ -15,10 +15,21 @@ $app->group('/artefacto', function(RouteCollectorProxy $articulo)
 $app->group('/cliente', function(RouteCollectorProxy $cliente)
 {
     $cliente->get('/{indice}/{limite}', Cliente::class . ':mostrarTodos' );
-    $cliente->get('/{id}', Cliente::class . ':buscar'  );
-    //También se puede hacer así
-    $cliente->get('/filtro/{indice}/{limite}', Cliente::class .':filtrar' );
+    $cliente->get('/{id}', Cliente::class . ':buscarCliente'  );
+  //  $cliente->get('/filtro/{indice}/{limite}', Cliente::class .':filtrar' );
+  //  $cliente->get('/numregs', Cliente::class .':numRegs' );
     $cliente->post('/', Cliente::class .':crear' );
     $cliente->put('/{id}', Cliente::class .':modificar' );
     $cliente->delete('/{id}', Cliente::class .':eliminar');
+});
+$app->group('/filtro', function(RouteCollectorProxy $filtro) {
+    $filtro->group('/cliente', function(RouteCollectorProxy $cliente) {
+        $cliente->get('/{indice}/{limite}', Cliente::class .':filtrar' );
+        $cliente->get('/numregs', Cliente::class .':numRegs' );      
+    });
+});
+$app->group('/auth', function(RouteCollectorProxy $auth)
+{
+    $auth->post('/iniciar', Auth::class .':iniciarSesion' );
+    $auth->get('/cerrar', Auth::class .':cerrarSesion');
 });
