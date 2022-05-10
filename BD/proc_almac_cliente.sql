@@ -26,7 +26,8 @@ begin
     SELECT concat("SELECT * from cliente where ", @filtro, " LIMIT ", 
         _pagina, ", ", _cantRegs) INTO @sql;
     PREPARE stmt FROM @sql;
-    EXECUTE stmt;   
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
 end$$
 
 DROP PROCEDURE IF EXISTS numRegsCliente$$

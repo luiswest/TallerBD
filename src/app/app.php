@@ -3,6 +3,8 @@ use DI\Container;
 use Slim\Factory\AppFactory;
 
 require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '/../../env.php';
+
 
 $cont_aux = new \DI\Container();
 
@@ -11,6 +13,12 @@ $app = AppFactory::create();
 
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(true, false, false);
+$app->add(new Tuupola\Middleware\JwtAuthentication([
+    "secure" => false,
+    "secret" => getenv('key'),
+    //"path" => ["/cliente"],
+    "ignore" => ["/auth/iniciar"]
+]));
 
 $container = $app->getContainer();
 require_once "config.php";

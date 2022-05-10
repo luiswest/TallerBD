@@ -39,7 +39,7 @@ class Usuario {
         return $res[0];
     }
     public function buscar ($usr) {
-        $sql = "call buscarUsuario(:idUsuario);";
+        $sql = "call buscarUsuario(-1, :idUsuario);";
         $con = $this->container->get('bd');
         $query = $con->prepare($sql);
         $query->bindParam('idUsuario', $usr, PDO::PARAM_STR);
