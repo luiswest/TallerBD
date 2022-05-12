@@ -4,7 +4,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Container\ContainerInterface;
 use PDO;
-class Cliente EXTENDS Usuario{
+class Administrador EXTENDS Usuario{
     protected $container;
     public function __construct(ContainerInterface $c) {
         $this->container = $c;
@@ -19,7 +19,7 @@ class Cliente EXTENDS Usuario{
             $cadena .= "%$valor%&";
         }
 
-        $sql = "call filtrarCliente('$cadena', $indice, $limite);";
+        $sql = "call filtrarAdministrador('$cadena', $indice, $limite);";
         $con = $this->container->get('bd');
         $query = $con->prepare($sql);
         $query->execute();
@@ -41,7 +41,7 @@ class Cliente EXTENDS Usuario{
         foreach($datos as $valor){
             $cadena .= "%$valor%&";
         }
-        $sql = "call numRegsCliente('$cadena');";
+        $sql = "call numRegsAdministrador('$cadena');";
         $con = $this->container->get('bd');
         $query = $con->prepare($sql);
         $query->execute();
@@ -54,23 +54,10 @@ class Cliente EXTENDS Usuario{
             ->withHeader('Content-Type', 'Application/json')
             ->withStatus(200);
     }
-    private function buscarIdCliente($id) {
-        $sql = "call buscarCliente(:id, '');";
-        $con = $this->container->get('bd');
-        $query = $con->prepare($sql);
-        $query->bindParam('id', $id, PDO::PARAM_INT);
-        $query->execute();
-        $res = $query->rowCount() > 0 ? $query->fetchAll() : 0;
-        
-      //  print_r($res[0]->idCliente); die(); 
-        if ($res == 0)  return 0;
-        return $res[0]->idCliente;
-      //  print_r($res);
-    }
-    public function buscarCliente (Request $request, Response $response, $args) {
+    public function buscarAdmin (Request $request, Response $response, $args) {
         //Retornar un registro por código
        // $id = $args['id'];
-        $sql = "call buscarCliente(:id);";
+        $sql = "call buscarAdministrador(:id);";
         $con = $this->container->get('bd');
         $query = $con->prepare($sql);
         $query->bindParam('id', $args['id'], PDO::PARAM_STR);
@@ -92,17 +79,17 @@ class Cliente EXTENDS Usuario{
     public function crear (Request $request, Response $response, $args) {
         //Crear nuevo
         $body = json_decode($request->getBody());
-        $body->idCliente = "C" . $body->idCliente;
-        $sql = "select nuevoCliente(";
+        $body->idAdmin = "A" . $body->idAdmin;
+        $sql = "select nuevoAdministrador(";
         foreach($body as $campo => $valor) {
             $sql .= ":$campo,";
             $d[$campo] = filter_var($valor, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         }
         $sql = rtrim($sql, ',') . ");";
-        $d['idUsuario'] = $d['idCliente'];
+        $d['idUsuario'] = $d['idAdmin'];
         // esta linéa puede ser del cliente o generado automáticamente
-        $d['passw'] = password_hash($d['idCliente'],PASSWORD_BCRYPT, ['cost' => 10]);
-        $res = $this->guardarUsuario($sql, $d,  4);
+        $d['passw'] = password_hash($d['idAdmin'],PASSWORD_BCRYPT, ['cost' => 10]);
+        $res = $this->guardarUsuario($sql, $d,  0);
         $status = $res > 0 ? 409 : 201;
 
         return $response
@@ -112,7 +99,7 @@ class Cliente EXTENDS Usuario{
         //Crear nuevo
         //$id = $args['id'];
         $body = json_decode($request->getBody());
-        $sql = "select editarCliente(:id,";
+        $sql = "select editarAdministrador(:id,";
         $d['id'] =  $args['id'];
         foreach($body as $campo => $valor) {
             $sql .= ":$campo,";
@@ -133,13 +120,18 @@ class Cliente EXTENDS Usuario{
             ->withStatus($status);
     }
     public function eliminar (Request $request, Response $response, $args) {
-        $idCliente = $this->buscarIdCliente($args['id']);
-        $res = 0;
-        if ($idCliente ==! 0)  {
-            $sql = "select eliminarCliente(:id);";
-            $res = $this->eliminarUsuario($sql, $idCliente, $args['id']);
-        }
-        $status = $res > 0 ? 200 : 404;
+        //$id = $args['id'];
+        $sql = "select eliminarAdministrador(:id);";
+        $con = $this->container->get('bd');
+        $query = $con->prepare($sql);
+        $query->bindParam('id', $args['id'], PDO::PARAM_STR);
+        $query->execute();
+        $res = $query->fetch(PDO::FETCH_NUM);     
+        $query = null;
+        $con = null;
+        $status = $res[0] > 0 ? 200 : 404;
+
+        //$response->getBody()->write(json_encode($res));
         return $response
             ->withStatus($status);
     }

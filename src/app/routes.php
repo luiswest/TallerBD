@@ -18,14 +18,24 @@ $app->group('/cliente', function(RouteCollectorProxy $cliente)
     $cliente->get('/{id}', Cliente::class . ':buscarCliente'  );
   //  $cliente->get('/filtro/{indice}/{limite}', Cliente::class .':filtrar' );
   //  $cliente->get('/numregs', Cliente::class .':numRegs' );
-    $cliente->post('/', Cliente::class .':crear' );
+    $cliente->post('', Cliente::class .':crear' );
     $cliente->put('/{id}', Cliente::class .':modificar' );
     $cliente->delete('/{id}', Cliente::class .':eliminar');
+});
+$app->group('/admin', function(RouteCollectorProxy $admin) {
+    $admin->get('/{id}', Administrador::class . ':buscarAdmin'  );
+    $admin->post('', Administrador::class .':crear' );
+    $admin->put('/{id}', Administrador::class .':modificar' );
+    $admin->delete('/{id}', Administrador::class .':eliminar');
 });
 $app->group('/filtro', function(RouteCollectorProxy $filtro) {
     $filtro->group('/cliente', function(RouteCollectorProxy $cliente) {
         $cliente->get('/{indice}/{limite}', Cliente::class .':filtrar' );
         $cliente->get('/numregs', Cliente::class .':numRegs' );      
+    });
+    $filtro->group('/admin', function(RouteCollectorProxy $admin) {
+        $admin->get('/{indice}/{limite}', Administrador::class .':filtrar' );
+        $admin->get('/numregs', Administrador::class .':numRegs' );      
     });
 });
 $app->group('/auth', function(RouteCollectorProxy $auth)

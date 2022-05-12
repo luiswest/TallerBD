@@ -11,9 +11,9 @@ begin
 end$$
 
 DROP PROCEDURE IF EXISTS buscarCliente$$
-CREATE PROCEDURE buscarCliente (_id int)
+CREATE PROCEDURE buscarCliente (_id int, _idCliente varchar(15))
 begin
-    select * from cliente where id = _id;
+    select * from cliente where id = _id or idCliente = _idCliente;
 end$$
 
 DROP PROCEDURE IF EXISTS filtrarCliente$$
