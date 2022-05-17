@@ -5,9 +5,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Container\ContainerInterface;
 use PDO;
 class Cliente EXTENDS Usuario{
-    protected $container;
-    public function __construct(ContainerInterface $c) {
-        $this->container = $c;
+    public function __construct(public ContainerInterface $container) {
     }
     public function filtrar (Request $request, Response $response, $args) {
         //Retornar todos los registros con limit
@@ -18,7 +16,6 @@ class Cliente EXTENDS Usuario{
         foreach($datos as $valor){
             $cadena .= "%$valor%&";
         }
-
         $sql = "call filtrarCliente('$cadena', $indice, $limite);";
         $con = $this->container->get('bd');
         $query = $con->prepare($sql);
@@ -101,7 +98,7 @@ class Cliente EXTENDS Usuario{
         $sql = rtrim($sql, ',') . ");";
         $d['idUsuario'] = $d['idCliente'];
         // esta linéa puede ser del cliente o generado automáticamente
-        $d['passw'] = password_hash($d['idCliente'],PASSWORD_BCRYPT, ['cost' => 10]);
+        $d['passw'] = Hash::hash($d['idCliente']);
         $res = $this->guardarUsuario($sql, $d,  4);
         $status = $res > 0 ? 409 : 201;
 

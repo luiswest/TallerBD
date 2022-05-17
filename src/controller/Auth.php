@@ -6,28 +6,7 @@ use Psr\Container\ContainerInterface;
 use Firebase\JWT\JWT;
 use PDO;
 class Auth extends Usuario {
-    protected $container;
-    public function __construct(ContainerInterface $c) {
-        $this->container = $c;
-    }
-    private function autenticar($usr, $passw) {
-        $datos = $this->buscar($usr);
-        return (($datos) &&  (password_verify($passw, $datos->passw))) ?
-        ["rol" => $datos->rol] : null;
-    }
-    private function generarToken($rol, $idUsuario) {
-      //  die(getenv('key'));
-        $key = getenv('key');
-        $payload = [
-            "iss" => $_SERVER['SERVER_NAME'],
-            "iat" => time(),
-            "exp" => time() + (60),
-            "sub" => $idUsuario,
-            "rol" => $rol
-        ] ;
-        return [
-            "token" => JWT::encode($payload, $key, 'HS256')
-        ];
+    public function __construct(public ContainerInterface $container) {
     }
     public function iniciarSesion(Request $request, Response $response, $args){
         $body = json_decode($request->getBody());
@@ -36,7 +15,7 @@ class Auth extends Usuario {
             $res['rol'] = '0';
         }
         if ($res) {
-            $retorno = $this->generarToken($res['rol'], $body->idUsuario);
+            $retorno = Token::generarTokens($body->idUsuario, $res['rol']);
             $response->getBody()->write(json_encode($retorno));
             $status = 200;
         } else {

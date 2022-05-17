@@ -16,8 +16,6 @@ $app->group('/cliente', function(RouteCollectorProxy $cliente)
 {
     $cliente->get('/{indice}/{limite}', Cliente::class . ':mostrarTodos' );
     $cliente->get('/{id}', Cliente::class . ':buscarCliente'  );
-  //  $cliente->get('/filtro/{indice}/{limite}', Cliente::class .':filtrar' );
-  //  $cliente->get('/numregs', Cliente::class .':numRegs' );
     $cliente->post('', Cliente::class .':crear' );
     $cliente->put('/{id}', Cliente::class .':modificar' );
     $cliente->delete('/{id}', Cliente::class .':eliminar');
@@ -41,5 +39,15 @@ $app->group('/filtro', function(RouteCollectorProxy $filtro) {
 $app->group('/auth', function(RouteCollectorProxy $auth)
 {
     $auth->post('/iniciar', Auth::class .':iniciarSesion' );
-    $auth->get('/cerrar', Auth::class .':cerrarSesion');
+    $auth->patch('/cerrar', Auth::class .':cerrarSesion');
+    $auth->patch('/refrescar', Auth::class .':cerrarSesion');
+});
+
+$app->group('/usuario', function(RouteCollectorProxy $usuario)
+{
+    $usuario->patch('/rol', Usuario::class .':cambiarRol' ); // pendientes
+    $usuario->group('/passw', function(RouteCollectorProxy $passw) {
+        $passw->patch('/cambio', Usuario::class .':cambiarPassw'); // pendientes
+        $passw->patch('/reset', Usuario::class .':resetPassw');// pendientes
+    });
 });

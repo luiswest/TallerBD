@@ -17,7 +17,8 @@ $app->add(new Tuupola\Middleware\JwtAuthentication([
     "secure" => false,
     "secret" => getenv('key'),
     //"path" => ["/cliente"],
-    "ignore" => ["/auth/iniciar","/admin", "/filtro","/cliente"]
+    "ignore" => ["/auth","/admin", "/filtro","/cliente", "/usuario"],
+    "algorithm" => "HS256"
 ]));
 
 $container = $app->getContainer();
