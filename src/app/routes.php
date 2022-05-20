@@ -40,7 +40,7 @@ $app->group('/auth', function(RouteCollectorProxy $auth)
 {
     $auth->post('/iniciar', Auth::class .':iniciarSesion' );
     $auth->patch('/cerrar', Auth::class .':cerrarSesion');
-    $auth->patch('/refrescar', Auth::class .':cerrarSesion');
+    $auth->patch('/refrescar', Auth::class .':refrescarSesion');
 });
 
 $app->group('/usuario', function(RouteCollectorProxy $usuario)

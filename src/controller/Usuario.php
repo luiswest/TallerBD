@@ -79,20 +79,26 @@ class Usuario {
             $query = $con->prepare($sqlGeneral);
             $query->bindParam('id', $id, PDO::PARAM_INT);
             $query->execute();
-
-            $sql = "select eliminarUsuario(:idUsuario);";
-            $query = $con->prepare($sql);
-            $query->bindParam('idUsuario',$idUsr, PDO::PARAM_INT);
-            $query->execute();
-            $con->commit();
+            $res = $query->fetchColumn();
+            if ($res == 1) {
+                $sql = "select eliminarUsuario(:idUsuario);";
+                $query = $con->prepare($sql);
+                $query->bindParam('idUsuario',$idUsr, PDO::PARAM_INT);
+                $query->execute();
+                $res = $query->fetch(PDO::FETCH_NUM);
+            }
+           $con->commit();
 
         } catch (PDOException $e) {
             $con->rollback();
         }  //fin de la transacción
-        $res = $query->fetch(PDO::FETCH_NUM);
+
         $query = null;
         $con = null;
-        return $res[0];
+        if (is_array($res)){
+            $res = $res[0];
+        }
+        return $res;
     }
     public function cambiarRol(Request $request, Response $response, $args) {
         $body = json_decode($request->getbody());

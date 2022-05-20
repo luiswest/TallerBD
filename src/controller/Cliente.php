@@ -136,7 +136,12 @@ class Cliente EXTENDS Usuario{
             $sql = "select eliminarCliente(:id);";
             $res = $this->eliminarUsuario($sql, $idCliente, $args['id']);
         }
-        $status = $res > 0 ? 200 : 404;
+        $status = match($res) {
+            '0',0 => 404,
+            '1',1 => 200,
+            '2',2 => 412
+        };
+       // $status = $res > 0 ? 200 : 404;
         return $response
             ->withStatus($status);
     }
